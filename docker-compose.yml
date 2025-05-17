@@ -1,33 +1,46 @@
-# E:\intern_deploy\docker-compose.yml
-services:
-  backend:
-    build: ./intern_backend
-    ports:
-      - "4000:4000"
-    environment:
-      - PORT=4000
-      - NEXT_PUBLIC_KEYCLOAK_URL=http://keycloak:8080
-      - RABBITMQ_URL=amqp://rabbitmq
-    depends_on:
-      - rabbitmq
-      - keycloak
-    networks:
-      - intern-network
+version: "3.8"
 
+services:
   frontend:
     build:
       context: ./intern
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://backend:4000/api
-        NEXT_PUBLIC_KEYCLOAK_URL: http://keycloak:8080
-        NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq
+        NEXT_PUBLIC_API_URL: http://103.192.198.177:4000/api
+        NEXT_PUBLIC_KEYCLOAK_URL: http://103.192.198.177:8080
+        NEXT_PUBLIC_RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
     ports:
       - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:4000/api
+      - NEXT_PUBLIC_KEYCLOAK_URL=http://103.192.198.177:8080
+      - NEXT_PUBLIC_RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
     depends_on:
-      - backend
-      - keycloak
-      - rabbitmq
+      backend:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - intern-network
+
+  backend:
+    build:
+      context: ./intern_backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - DATABASE_URL=${DATABASE_URL}
+      - KEYCLOAK_URL=http://keycloak:8080
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - intern-network
 
@@ -37,19 +50,29 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - intern-network
 
   keycloak:
     image: quay.io/keycloak/keycloak:21.1.1
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
     command: start-dev
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - intern-network
 
