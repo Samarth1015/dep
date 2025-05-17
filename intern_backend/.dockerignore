@@ -1,0 +1,4 @@
+# E:\intern_deploy\intern_backend\.dockerignore
+node_modules
+dist
+.env
