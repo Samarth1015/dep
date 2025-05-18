@@ -40,7 +40,9 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const connection = await amqplib.connect("amqp://localhost");
+    const connection = await amqplib.connect(
+      process.env.NEXT_PUBLIC_RABBITMQ_URL || "amqp://localhost"
+    );
     const channel = await connection.createChannel();
     const queue = "upload-files";
 
