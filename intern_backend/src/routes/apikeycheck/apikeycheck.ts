@@ -42,7 +42,7 @@ router.get("/", async (req: any, res: any) => {
   }
 });
 
-router.post("/", keycloak.protect(), async (req: any, res: any) => {
+router.post("/", async (req: any, res: any) => {
   console.log("ssss");
   const authHeader = req.headers.authorization;
   const { accessKeyId, secretAccessKey } = await req.body;
@@ -55,7 +55,9 @@ router.post("/", keycloak.protect(), async (req: any, res: any) => {
   }
   const token = authHeader.split(" ")[1];
   const decoded = jwt.decode(token) as { given_name: string; email: string };
+
   try {
+    // console.log("----->");
     const newuser = await prisma.user.create({
       data: {
         email: decoded.email,
@@ -64,7 +66,8 @@ router.post("/", keycloak.protect(), async (req: any, res: any) => {
         secretAccesskeyId: secretAccessKey,
       },
     });
-    res.status(200).json({ user: newuser });
+    console.log(newuser);
+    return res.status(200).json({ user: newuser });
   } catch (err) {
     res.status(404).json({ error: "not made the new user" });
   }

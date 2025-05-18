@@ -10,7 +10,7 @@ const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../../../client/db");
 const s3client_1 = require("../../../util/s3client");
-const redis_1 = __importDefault(require("../../../client/redis"));
+// import Redisclient from "../../../client/redis";
 const router = express_1.default.Router();
 router.post("/", async (req, res) => {
     try {
@@ -53,9 +53,9 @@ router.post("/", async (req, res) => {
                 pathStyleUrl: presignedUrl,
             };
         }));
-        await redis_1.default.set(bucket, JSON.stringify(files.filter(Boolean)), {
-            EX: 60,
-        });
+        // await Redisclient.set(bucket, JSON.stringify(files.filter(Boolean)), {
+        //   EX: 60,
+        // });
         return res.json(files.filter(Boolean));
     }
     catch (error) {

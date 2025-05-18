@@ -11,7 +11,7 @@ const memoryStore = new express_session_1.default.MemoryStore();
 exports.memoryStore = memoryStore;
 const keycloak = new keycloak_connect_1.default({ store: memoryStore }, {
     realm: "internrealm",
-    "auth-server-url": "http://localhost:8080",
+    "auth-server-url": "http://keycloak:8080",
     resource: "nextjs-client",
     "ssl-required": "external",
     "confidential-port": 0,

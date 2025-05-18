@@ -43,6 +43,7 @@ export default function FetchKeyPage() {
   }, [authenticated, token, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("submiting");
     e.preventDefault();
     if (!token) return;
 

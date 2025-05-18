@@ -10,7 +10,7 @@ interface Config {
 }
 
 const config: Config = {
-  port: Number(process.env.PORT) || 5000,
+  port: Number(process.env.PORT) || 4000,
   nodeEnv: process.env.NODE_ENV || "development",
   JWT_SECRET: process.env.JWT_SECRET || "your-jwt-secret-key",
   REFRESH_TOKEN_SECRET:

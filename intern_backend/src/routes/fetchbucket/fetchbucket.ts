@@ -21,12 +21,14 @@ router.get("/", (async (req: Request, res: Response) => {
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = (await jwt.decode(token)) as { email: string };
+    const decoded = jwt.decode(token) as { email: string };
 
     const users = await prisma.user.findUnique({
       where: { email: decoded.email },
     });
     console.log(decoded);
+
+    console.log("--->", users);
     const s3Client = s3ClientPathStyle(
       users?.accessKeyID,
       users?.secretAccesskeyId

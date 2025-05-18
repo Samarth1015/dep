@@ -1,5 +1,5 @@
 "use strict";
-// src/rabbitmq/consumer.ts
+// E:\intern_deploy\intern_backend\src\rabitmq\index.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,8 +11,22 @@ const s3client_1 = require("../../util/s3client");
 const db_1 = require("../../client/db");
 const startRabbitMQConsumer = async () => {
     console.log(" RabbitMQ consumer starting...");
+    const connectWithRetry = async (url, retries = 10, delay = 3000) => {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const connection = await amqplib_1.default.connect(url);
+                return connection;
+            }
+            catch (err) {
+                console.log(`RabbitMQ connection failed (attempt ${i + 1}/${retries}). Retrying in ${delay / 1000}s...`);
+                await new Promise((res) => setTimeout(res, delay));
+            }
+        }
+        throw new Error("Failed to connect to RabbitMQ after multiple attempts");
+    };
     try {
-        const connection = await amqplib_1.default.connect("amqp://localhost");
+        console.log("--->", process.env.RABBITMQ_URL);
+        const connection = await connectWithRetry("amqp://localhost");
         const channel = await connection.createChannel();
         const queue = "upload-files";
         await channel.assertQueue(queue, { durable: true });

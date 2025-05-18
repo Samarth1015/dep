@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const keyclock_1 = require("../../../middleware/keyclock");
 const db_1 = require("../../../client/db");
 const router = (0, express_1.Router)();
-router.get("/", keyclock_1.keycloak.protect(), async (req, res) => {
+router.get("/", async (req, res) => {
     try {
+        console.log("hitting");
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res
@@ -21,6 +21,7 @@ router.get("/", keyclock_1.keycloak.protect(), async (req, res) => {
         const email = decoded.email;
         console.log(email);
         const users = await db_1.prisma.user.findUnique({ where: { email: email } });
+        console.log(users);
         if (!users) {
             return res.status(404).json({ error: "no user found" });
         }
@@ -37,7 +38,7 @@ router.get("/", keyclock_1.keycloak.protect(), async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 });
-router.post("/", keyclock_1.keycloak.protect(), async (req, res) => {
+router.post("/", async (req, res) => {
     console.log("ssss");
     const authHeader = req.headers.authorization;
     const { accessKeyId, secretAccessKey } = await req.body;
@@ -50,6 +51,7 @@ router.post("/", keyclock_1.keycloak.protect(), async (req, res) => {
     const token = authHeader.split(" ")[1];
     const decoded = jsonwebtoken_1.default.decode(token);
     try {
+        // console.log("----->");
         const newuser = await db_1.prisma.user.create({
             data: {
                 email: decoded.email,
@@ -58,7 +60,8 @@ router.post("/", keyclock_1.keycloak.protect(), async (req, res) => {
                 secretAccesskeyId: secretAccessKey,
             },
         });
-        res.status(200).json({ user: newuser });
+        console.log(newuser);
+        return res.status(200).json({ user: newuser });
     }
     catch (err) {
         res.status(404).json({ error: "not made the new user" });

@@ -11,7 +11,7 @@ const s3ClientPathStyle = (accessKeyId, secretAccessKey) => {
     }
     console.log(accessKeyId, secretAccessKey);
     return new client_s3_1.S3Client({
-        endpoint: `https://${endpoint}`,
+        endpoint: `https://idr01.zata.ai`,
         region,
         credentials: {
             accessKeyId: accessKeyId.trim(),

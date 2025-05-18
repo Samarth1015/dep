@@ -20,11 +20,12 @@ router.get("/", (async (req, res) => {
                 .json({ error: "Missing or invalid Authorization header" });
         }
         const token = authHeader.split(" ")[1];
-        const decoded = (await jsonwebtoken_1.default.decode(token));
+        const decoded = jsonwebtoken_1.default.decode(token);
         const users = await db_1.prisma.user.findUnique({
             where: { email: decoded.email },
         });
         console.log(decoded);
+        console.log("--->", users);
         const s3Client = (0, s3client_1.s3ClientPathStyle)(users?.accessKeyID, users?.secretAccesskeyId);
         const command = new client_s3_1.ListBucketsCommand({});
         const response = await s3Client.send(command);
