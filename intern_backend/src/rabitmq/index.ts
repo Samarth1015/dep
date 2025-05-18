@@ -24,7 +24,9 @@ export const startRabbitMQConsumer = async () => {
 
   try {
     console.log("--->", process.env.RABBITMQ_URL);
-    const connection = await connectWithRetry("amqp://localhost");
+    const connection = await connectWithRetry(
+      process.env.RABBITMQ_URL || "amqp://localhost"
+    );
 
     const channel = await connection.createChannel();
     const queue = "upload-files";
