@@ -22,8 +22,8 @@ services:
       context: ./intern
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://backend:4000/api
-        NEXT_PUBLIC_KEYCLOAK_URL: http://localhost:8080
+        NEXT_PUBLIC_API_URL: http://103.192.198.177:4000/api
+        NEXT_PUBLIC_KEYCLOAK_URL: https://103.192.198.177:8080
         NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq
     ports:
       - "3000:3000"
@@ -45,18 +45,18 @@ services:
     networks:
       - intern-network
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:21.1.1
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_PROXY: edge
-      KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_HTTPS: "false"
-      KEYCLOAK_FRONTEND_URL: https://samarthprojectsk.duckdns.org/auth/
-    command: start-dev --hostname-path=/auth
-    ports:
-      - "8080:8080"
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:21.1.1
+  #   environment:
+  #     KEYCLOAK_ADMIN: admin
+  #     KEYCLOAK_ADMIN_PASSWORD: admin
+  #     KC_PROXY: edge
+  #     KC_HOSTNAME_STRICT: "false"
+  #     KC_HOSTNAME_STRICT_HTTPS: "false"
+  #     KEYCLOAK_FRONTEND_URL: https://samarthprojectsk.duckdns.org/auth/
+  #   command: start-dev --hostname-path=/auth
+  #   ports:
+  #     - "8080:8080"
 
 networks:
   intern-network:

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../component/provider/keycloakprovider";
+import { baseURL } from "../../../client/api";
 // import { baseURL } from "../../../client/api";
 
 export default function FetchKeyPage() {
@@ -19,7 +20,7 @@ export default function FetchKeyPage() {
       if (!authenticated || !token) return;
 
       try {
-        const res = await fetch(`http://localhost:4000/api/keys`, {
+        const res = await fetch(`${baseURL}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -48,7 +49,7 @@ export default function FetchKeyPage() {
     if (!token) return;
 
     try {
-      const res = await fetch(`http://localhost:4000/api/keys`, {
+      const res = await fetch(`${baseURL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
