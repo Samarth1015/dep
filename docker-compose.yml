@@ -1,3 +1,4 @@
+# E:\intern_deploy\docker-compose.yml
 version: "3.8"
 
 services:
@@ -53,7 +54,8 @@ services:
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_PROXY: "edge"
-    command: start-dev
+    command: start-dev --spi-login-protocol-openid-connect-ssl-required=none
+
     ports:
       - "8080:8080"
     networks:
