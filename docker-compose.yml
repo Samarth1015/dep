@@ -53,7 +53,8 @@ services:
       KC_PROXY: edge
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
-    command: start-dev
+      KEYCLOAK_FRONTEND_URL: https://samarthprojectsk.duckdns.org/auth/
+    command: start-dev --hostname-path=/auth
     ports:
       - "8080:8080"
 
