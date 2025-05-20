@@ -23,7 +23,7 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: http://103.192.198.177:4000/api
-        NEXT_PUBLIC_KEYCLOAK_URL: https://103.192.198.177:8080
+        NEXT_PUBLIC_KEYCLOAK_URL: http://192.168.0.163:8080
         NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq
     ports:
       - "3000:3000"
