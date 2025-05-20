@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../../component/provider/keycloakprovider";
+import Script from "next/script";
 // import { Providers } from "../../component/provider/provider";
 
 const geistSans = Geist({
@@ -30,6 +31,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
+        <Script src="bower_components/promiz/promiz.js"></Script>
+        <Script src="bower_components/webcrypto-shim/webcrypto-shim.js"></Script>
       </body>
     </html>
   );
