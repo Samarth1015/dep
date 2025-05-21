@@ -20,7 +20,7 @@ export default function FetchKeyPage() {
       if (!authenticated || !token) return;
 
       try {
-        const res = await fetch(`${baseURL}`, {
+        const res = await fetch(`${baseURL}/keys`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -49,7 +49,7 @@ export default function FetchKeyPage() {
     if (!token) return;
 
     try {
-      const res = await fetch(`${baseURL}`, {
+      const res = await fetch(`${baseURL}/keys`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -12,7 +12,7 @@ export default function Home() {
 
   const checkKeys = async (token: string) => {
     console.log(baseURL);
-    const res = await fetch(`${baseURL}`, {
+    const res = await fetch(`${baseURL}/keys`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
