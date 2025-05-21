@@ -21,11 +21,15 @@ services:
       context: ./intern
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:4000/api
+        NEXT_PUBLIC_API_URL: http://103.192.198.177:4000/api
         NEXT_PUBLIC_KEYCLOAK_URL: https://key-test.neev.work
         NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq:5672
     ports:
-      - "3000:3000"
+      - "3000:3000" # HTTP for fallback/local testing
+      - "443:3000" # HTTPS for external access
+    volumes:
+      - /root/keycloak/certs/fullchain.pem:/certs/fullchain.pem
+      - /root/keycloak/certs/privkey.pem:/certs/privkey.pem
     depends_on:
       - backend
       - keycloak
