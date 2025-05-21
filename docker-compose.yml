@@ -8,7 +8,7 @@ services:
     environment:
       - PORT=4000
       - DATABASE_URL=postgresql://postgres.lxjywvztsesakqfvnrho:nandini>samarth@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
-      - NEXT_PUBLIC_KEYCLOAK_URL=https://key-test.neev.work
+      - NEXT_PUBLIC_KEYCLOAK_URL=https://key-test.neev.work:8443
       - RABBITMQ_URL=amqp://rabbitmq:5672
     depends_on:
       - rabbitmq
@@ -22,18 +22,27 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: http://103.192.198.177:4000/api
-        NEXT_PUBLIC_KEYCLOAK_URL: https://key-test.neev.work
+        NEXT_PUBLIC_KEYCLOAK_URL: https://key-test.neev.work:8443
         NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq:5672
     ports:
-      - "3000:3000" # HTTP for fallback/local testing
-      - "442:3000" # HTTPS for external access
-    volumes:
-      - /root/keycloak/certs/fullchain.pem:/certs/fullchain.pem
-      - /root/keycloak/certs/privkey.pem:/certs/privkey.pem
+      - "3001:3000" # HTTP for internal/testing
     depends_on:
       - backend
       - keycloak
       - rabbitmq
+    networks:
+      - intern-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "3000:443" # HTTPS for frontend
+    volumes:
+      - /root/frontend/certs/fullchain.pem:/etc/nginx/certs/fullchain.pem
+      - /root/frontend/certs/privkey.pem:/etc/nginx/certs/privkey.pem
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
     networks:
       - intern-network
 
@@ -69,8 +78,8 @@ services:
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=true
     ports:
-      - "8080:8080"
-      - "443:8443"
+      - "8080:8080" # Optional HTTP for local testing
+      - "8443:8443" # HTTPS for Keycloak
     volumes:
       - /root/keycloak/certs/fullchain.pem:/etc/x509/https/fullchain.pem
       - /root/keycloak/certs/privkey.pem:/etc/x509/https/privkey.pem
@@ -96,8 +105,8 @@ services:
     container_name: postgres
     environment:
       POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: sam123
+    POSTGRES_USER: keycloak
+    POSTGRES_PASSWORD: sam123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
