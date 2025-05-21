@@ -11,13 +11,13 @@ export default function Home() {
   // const [message, setMessage] = useState("");
 
   const checkKeys = async (token: string) => {
-    console.log(baseURL);
+    console.log("byeeuseeffect", baseURL);
     const res = await fetch(`${baseURL}/keys`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(res);
+    console.log("--->", res);
 
     if (res.status === 200) {
       router.push("/files");
@@ -30,6 +30,7 @@ export default function Home() {
     console.log(authenticated, token);
     if (!authenticated || !token) return;
     (async () => {
+      console.log("-->", token);
       await checkKeys(token);
     })();
   }, [authenticated, token]);
