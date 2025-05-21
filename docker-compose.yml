@@ -1,4 +1,3 @@
-# E:\intern_deploy\docker-compose.yml
 version: "3.8"
 
 services:
@@ -9,11 +8,11 @@ services:
     environment:
       - PORT=4000
       - DATABASE_URL=postgresql://postgres.lxjywvztsesakqfvnrho:nandini>samarth@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
-      - NEXT_PUBLIC_KEYCLOAK_URL=http://keycloak:8080
-      - RABBITMQ_URL=amqp://rabbitmq
+      - NEXT_PUBLIC_KEYCLOAK_URL=https://key-test.neev.work
+      - RABBITMQ_URL=amqp://rabbitmq:5672
     depends_on:
       - rabbitmq
-      # - keycloak
+      - keycloak
     networks:
       - intern-network
 
@@ -22,14 +21,14 @@ services:
       context: ./intern
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://103.192.198.177:4000/api
-        NEXT_PUBLIC_KEYCLOAK_URL: http://192.168.0.163:8080
-        NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq
+        NEXT_PUBLIC_API_URL: http://localhost:4000/api
+        NEXT_PUBLIC_KEYCLOAK_URL: https://key-test.neev.work
+        NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq:5672
     ports:
       - "3000:3000"
     depends_on:
       - backend
-      # - keycloak
+      - keycloak
       - rabbitmq
     networks:
       - intern-network
@@ -44,20 +43,71 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     networks:
       - intern-network
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # keycloak:
-  #   image: quay.io/keycloak/keycloak:21.1.1
-  #   environment:
-  #     KEYCLOAK_ADMIN: admin
-  #     KEYCLOAK_ADMIN_PASSWORD: admin
-  #     KC_PROXY: edge
-  #     KC_HOSTNAME_STRICT: "false"
-  #     KC_HOSTNAME_STRICT_HTTPS: "false"
-  #     KEYCLOAK_FRONTEND_URL: https://samarthprojectsk.duckdns.org/auth/
-  #   command: start-dev --hostname-path=/auth
-  #   ports:
-  #     - "8080:8080"
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=key-test.neev.work
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_DB_USERNAME=keycloak_user
+      - KC_DB_PASSWORD=sam123
+      - KC_PROXY=edge
+      - KC_HTTPS_PORT=8443
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=true
+    ports:
+      - "8080:8080" # Optional HTTP for local testing
+      - "443:8443" # HTTPS for public access
+    volumes:
+      - /root/keycloak/certs/fullchain.pem:/etc/x509/https/fullchain.pem
+      - /root/keycloak/certs/privkey.pem:/etc/x509/https/privkey.pem
+      - keycloak-data:/opt/keycloak/data
+      - /root/keycloak/providers:/opt/keycloak/providers
+      - /root/keycloak/themes:/opt/keycloak/themes
+    entrypoint: >
+      /bin/bash -c "
+      /opt/keycloak/bin/kc.sh build &&
+      /opt/keycloak/bin/kc.sh start --https-certificate-file=/etc/x509/https/fullchain.pem --https-certificate-key-file=/etc/x509/https/privkey.pem --hostname key-test.neev.work --optimized"
+    networks:
+      - intern-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://key-test.neev.work:8443"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: sam123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - intern-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "keycloak_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   intern-network:
     driver: bridge
+
+volumes:
+  keycloak-data:
+  postgres_data:
