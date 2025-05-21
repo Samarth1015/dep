@@ -105,8 +105,8 @@ services:
     container_name: postgres
     environment:
       POSTGRES_DB: keycloak
-    POSTGRES_USER: keycloak
-    POSTGRES_PASSWORD: sam123
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: sam123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
