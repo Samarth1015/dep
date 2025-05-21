@@ -4,7 +4,7 @@ services:
   backend:
     build: ./intern_backend
     ports:
-      - "4000:4000"
+      - "4001:4000" # HTTP for internal/testing
     environment:
       - PORT=4000
       - DATABASE_URL=postgresql://postgres.lxjywvztsesakqfvnrho:nandini>samarth@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
@@ -21,7 +21,7 @@ services:
       context: ./intern
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://103.192.198.177:4000/api
+        NEXT_PUBLIC_API_URL: https://103.192.198.177:4000/api
         NEXT_PUBLIC_KEYCLOAK_URL: https://key-test.neev.work:8443
         NEXT_PUBLIC_RABBITMQ_URL: amqp://rabbitmq:5672
     ports:
@@ -37,12 +37,14 @@ services:
     image: nginx:alpine
     ports:
       - "3000:443" # HTTPS for frontend
+      - "4000:4000" # HTTPS for backend
     volumes:
       - /root/frontend/certs/fullchain.pem:/etc/nginx/certs/fullchain.pem
       - /root/frontend/certs/privkey.pem:/etc/nginx/certs/privkey.pem
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - frontend
+      - backend
     networks:
       - intern-network
 
