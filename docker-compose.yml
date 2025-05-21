@@ -54,19 +54,19 @@ services:
     container_name: keycloak
     environment:
       - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin_password
+      - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_HOSTNAME=key-test.neev.work
       - KC_DB=postgres
       - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
-      - KC_DB_USERNAME=keycloak_user
-      - KC_DB_PASSWORD=keycloak_password
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=sam123
       - KC_PROXY=edge
       - KC_HTTPS_PORT=8443
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=true
     ports:
-      - "8080:8080" # Optional HTTP for local testing
-      - "443:8443" # HTTPS for public access
+      - "8080:8080"
+      - "443:8443"
     volumes:
       - /root/keycloak/certs/fullchain.pem:/etc/x509/https/fullchain.pem
       - /root/keycloak/certs/privkey.pem:/etc/x509/https/privkey.pem
@@ -92,14 +92,14 @@ services:
     container_name: postgres
     environment:
       POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak_user
-      POSTGRES_PASSWORD: keycloak_password
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: sam123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - intern-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "keycloak_user", "-d", "keycloak"]
+      test: ["CMD", "pg_isready", "-U", "keycloak", "-d", "keycloak"]
       interval: 10s
       timeout: 5s
       retries: 5
